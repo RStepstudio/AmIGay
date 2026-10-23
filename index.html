@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Verification Portal</title>
+<style>
+body{font-family:Arial,sans-serif;background:#0f0f0f;color:#eee;display:flex;justify-content:center;padding:40px;}
+.card{background:#1a1a1a;padding:30px;border-radius:12px;max-width:500px;width:100%;box-shadow:0 0 20px #000;}
+h1{font-size:22px;margin-bottom:10px;}
+.step{margin:20px 0;}
+button{background:#4caf50;color:#fff;border:none;padding:10px 18px;border-radius:6px;cursor:pointer;font-size:16px;}
+button:hover{background:#45a049;}
+input{width:100%;padding:10px;border-radius:6px;border:1px solid #444;background:#111;color:#fff;font-size:16px;box-sizing:border-box;}
+.progress{height:8px;background:#333;border-radius:4px;overflow:hidden;margin-bottom:20px;}
+.bar{height:100%;background:#4caf50;width:0%;}
+.result{font-size:28px;font-weight:bold;text-align:center;margin-top:20px;color:#ff5252;}
+</style>
+</head>
+<body>
+<div class="card">
+<div class="progress"><div class="bar" id="bar"></div></div>
+<h1 id="title">Step 1 of 50</h1>
+<div id="content"></div>
+</div>
+<script>
+const steps = [
+ "Accept Terms of Service","Accept Privacy Policy","Accept Cookie Policy","Confirm you are 18+",
+ "Agree to data collection","Accept marketing emails","Confirm nationality","Verify identity",
+ "Accept refund policy","Accept community guidelines","Confirm email ownership","Accept tracking",
+ "Accept analytics","Confirm device ownership","Accept third-party sharing","Accept geolocation",
+ "Confirm phone number","Accept SMS updates","Accept push notifications","Accept biometric data",
+ "Confirm payment method","Accept subscription terms","Accept auto-renewal","Accept cancellation policy",
+ "Confirm billing address","Accept shipping terms","Accept return policy","Confirm tax compliance",
+ "Accept export controls","Accept age verification","Confirm parental consent","Accept accessibility terms",
+ "Accept DMCA policy","Accept anti-spam policy","Confirm account security","Accept password policy",
+ "Accept 2FA terms","Confirm backup codes","Accept recovery email","Accept security questions",
+ "Confirm identity documents","Accept KYC","Accept AML","Confirm sanctions screening",
+ "Accept risk disclosure","Accept liability waiver","Accept arbitration clause","Accept class action waiver",
+ "Final confirmation","I have read everything"
+];
+let i=0;
+const title=document.getElementById('title');
+const content=document.getElementById('content');
+const bar=document.getElementById('bar');
+function render(){
+  bar.style.width=(i/steps.length*100)+'%';
+  title.textContent='Step '+(i+1)+' of '+steps.length;
+  content.innerHTML='';
+  const p=document.createElement('p');
+  p.textContent=steps[i];
+  content.appendChild(p);
+  const btn=document.createElement('button');
+  btn.textContent='Accept';
+  btn.onclick=()=>{i++; if(i<steps.length) render(); else claim();}
+  content.appendChild(btn);
+}
+function claim(){
+  bar.style.width='100%';
+  title.textContent='Result Ready';
+  content.innerHTML='<p>We have your result. Claim it by entering your email.</p><input id="email" type="email" placeholder="you@example.com"><br><br><button id="verify">Verify</button>';
+  document.getElementById('verify').onclick=()=>{
+    const e=document.getElementById('email').value;
+    const r=document.createElement('div');
+    r.className='result';
+    r.textContent='You are gay.';
+    content.appendChild(r);
+  };
+}
+render();
+</script>
+</body>
+</html>
