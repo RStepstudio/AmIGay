@@ -4,22 +4,25 @@
 <meta charset="UTF-8">
 <title>Verification Portal</title>
 <style>
-body{font-family:Arial,sans-serif;background:#0f0f0f;color:#eee;display:flex;justify-content:center;padding:40px;}
-.card{background:#1a1a1a;padding:30px;border-radius:12px;max-width:500px;width:100%;box-shadow:0 0 20px #000;}
-h1{font-size:22px;margin-bottom:10px;}
-.step{margin:20px 0;}
-button{background:#4caf50;color:#fff;border:none;padding:10px 18px;border-radius:6px;cursor:pointer;font-size:16px;}
-button:hover{background:#45a049;}
-input{width:100%;padding:10px;border-radius:6px;border:1px solid #444;background:#111;color:#fff;font-size:16px;box-sizing:border-box;}
+*{box-sizing:border-box;}
+html,body{margin:0;height:100%;background:#0a0a0a;color:#eee;font-family:Arial,sans-serif;display:flex;align-items:center;justify-content:center;}
+.card{background:#1a1a1a;padding:30px;border-radius:14px;max-width:560px;width:90%;box-shadow:0 0 30px #000;opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease;}
+.card.show{opacity:1;transform:translateY(0);}
+h1{font-size:20px;margin-bottom:12px;}
+.step{margin:18px 0;min-height:120px;}
+button{background:#4caf50;color:#fff;border:none;padding:10px 18px;border-radius:6px;cursor:pointer;font-size:16px;margin-top:10px;}
+button:disabled{background:#555;cursor:not-allowed;}
+input{width:100%;padding:10px;border-radius:6px;border:1px solid #444;background:#111;color:#fff;font-size:16px;}
 .progress{height:8px;background:#333;border-radius:4px;overflow:hidden;margin-bottom:20px;}
-.bar{height:100%;background:#4caf50;width:0%;}
+.bar{height:100%;background:#4caf50;width:0%;transition:width .6s ease;}
+.tos{font-size:13px;color:#aaa;max-height:120px;overflow:auto;border:1px solid #333;padding:8px;border-radius:6px;margin-top:8px;}
 .result{font-size:28px;font-weight:bold;text-align:center;margin-top:20px;color:#ff5252;}
 </style>
 </head>
 <body>
-<div class="card">
+<div class="card" id="card">
 <div class="progress"><div class="bar" id="bar"></div></div>
-<h1 id="title">Step 1 of 50</h1>
+<h1 id="title"></h1>
 <div id="content"></div>
 </div>
 <script>
@@ -38,33 +41,43 @@ const steps = [
  "Accept risk disclosure","Accept liability waiver","Accept arbitration clause","Accept class action waiver",
  "Final confirmation","I have read everything"
 ];
+const tosText = "By using this service you agree that we may collect, store, process, and share your personal data including but not limited to name, email, device identifiers, location, browsing history, and biometric information with our partners and affiliates worldwide. You waive any right to class action and agree to binding arbitration. Data may be retained indefinitely. You consent to automated decision-making and profiling. This agreement is governed by the laws of nowhere.";
+const privText = "We collect information you provide, information from your device, and information from third parties. We use it to operate, improve, and personalize our services, to communicate with you, and for security. We share data with service providers, business partners, and when required by law. You may request deletion subject to retention requirements. Cookies and similar technologies are used for analytics and advertising.";
 let i=0;
 const title=document.getElementById('title');
 const content=document.getElementById('content');
 const bar=document.getElementById('bar');
-function render(){
+const card=document.getElementById('card');
+function show(){card.classList.remove('show');void card.offsetWidth;card.classList.add('show');}
+function next(){
   bar.style.width=(i/steps.length*100)+'%';
   title.textContent='Step '+(i+1)+' of '+steps.length;
   content.innerHTML='';
-  const p=document.createElement('p');
-  p.textContent=steps[i];
-  content.appendChild(p);
-  const btn=document.createElement('button');
-  btn.textContent='Accept';
-  btn.onclick=()=>{i++; if(i<steps.length) render(); else claim();}
+  const p=document.createElement('p');p.textContent=steps[i];content.appendChild(p);
+  const t=document.createElement('div');t.className='tos';t.textContent=tosText;content.appendChild(t);
+  const pv=document.createElement('div');pv.className='tos';pv.textContent=privText;content.appendChild(pv);
+  const cb=document.createElement('input');cb.type='checkbox';cb.id='cb';
+  const lbl=document.createElement('label');lbl.htmlFor='cb';lbl.textContent=' I accept';
+  content.appendChild(cb);content.appendChild(lbl);
+  const btn=document.createElement('button');btn.textContent='Accept';btn.disabled=true;
+  cb.onchange=()=>btn.disabled=!cb.checked;
+  btn.onclick=()=>{
+    btn.disabled=true;cb.disabled=true;
+    setTimeout(()=>{i++; if(i<steps.length) render(); else claim();},2000);
+  };
   content.appendChild(btn);
+  show();
 }
+function render(){next();}
 function claim(){
   bar.style.width='100%';
   title.textContent='Result Ready';
   content.innerHTML='<p>We have your result. Claim it by entering your email.</p><input id="email" type="email" placeholder="you@example.com"><br><br><button id="verify">Verify</button>';
   document.getElementById('verify').onclick=()=>{
-    const e=document.getElementById('email').value;
-    const r=document.createElement('div');
-    r.className='result';
-    r.textContent='You are gay.';
+    const r=document.createElement('div');r.className='result';r.textContent='You are gay.';
     content.appendChild(r);
   };
+  show();
 }
 render();
 </script>
