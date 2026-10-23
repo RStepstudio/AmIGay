@@ -3,28 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <title>Verification Portal</title>
-<style>
-*{box-sizing:border-box;}
-html,body{margin:0;height:100%;background:#0a0a0a;color:#eee;font-family:Arial,sans-serif;display:flex;align-items:center;justify-content:center;}
-.card{background:#1a1a1a;padding:30px;border-radius:14px;max-width:560px;width:90%;box-shadow:0 0 30px #000;opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease;}
-.card.show{opacity:1;transform:translateY(0);}
-h1{font-size:20px;margin-bottom:12px;}
-.step{margin:18px 0;min-height:120px;}
-button{background:#4caf50;color:#fff;border:none;padding:10px 18px;border-radius:6px;cursor:pointer;font-size:16px;margin-top:10px;}
-button:disabled{background:#555;cursor:not-allowed;}
-input{width:100%;padding:10px;border-radius:6px;border:1px solid #444;background:#111;color:#fff;font-size:16px;}
-.progress{height:8px;background:#333;border-radius:4px;overflow:hidden;margin-bottom:20px;}
-.bar{height:100%;background:#4caf50;width:0%;transition:width .6s ease;}
-.tos{font-size:13px;color:#aaa;max-height:120px;overflow:auto;border:1px solid #333;padding:8px;border-radius:6px;margin-top:8px;}
-.result{font-size:28px;font-weight:bold;text-align:center;margin-top:20px;color:#ff5252;}
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
+<div class="bg"></div>
+<div class="bubbles" id="bubbles"></div>
+<div class="wrap">
 <div class="card" id="card">
 <div class="progress"><div class="bar" id="bar"></div></div>
 <h1 id="title"></h1>
 <div id="content"></div>
 </div>
+</div>
+<div class="overlay" id="overlay"><div class="spinner"></div></div>
 <script>
 const steps = [
  "Accept Terms of Service","Accept Privacy Policy","Accept Cookie Policy","Confirm you are 18+",
@@ -41,41 +32,58 @@ const steps = [
  "Accept risk disclosure","Accept liability waiver","Accept arbitration clause","Accept class action waiver",
  "Final confirmation","I have read everything"
 ];
-const tosText = "By using this service you agree that we may collect, store, process, and share your personal data including but not limited to name, email, device identifiers, location, browsing history, and biometric information with our partners and affiliates worldwide. You waive any right to class action and agree to binding arbitration. Data may be retained indefinitely. You consent to automated decision-making and profiling. This agreement is governed by the laws of nowhere.";
-const privText = "We collect information you provide, information from your device, and information from third parties. We use it to operate, improve, and personalize our services, to communicate with you, and for security. We share data with service providers, business partners, and when required by law. You may request deletion subject to retention requirements. Cookies and similar technologies are used for analytics and advertising.";
+const policies = steps.map((s,idx)=>`POLICY ${idx+1}: ${s}\n\n`+`This document governs your use of the service in relation to "${s}". By continuing you acknowledge that we may collect, process, retain, and share data necessary to enforce this policy, including identifiers, device metadata, usage logs, and derived inferences. You agree that enforcement may be automated and that decisions may be irreversible. Data may be transferred across borders and retained for the maximum period permitted by law. You waive any right to individual or class-wide relief related to this policy and consent to binding arbitration. Modifications may be made without notice and continued use constitutes acceptance. You confirm you have read, understood, and voluntarily agreed to all terms herein, including any referenced documents and future amendments. Failure to comply may result in suspension or termination without refund. This policy is provided as-is without warranties. Governing law: none specified. Disputes: arbitration only. Contact: none.`);
 let i=0;
 const title=document.getElementById('title');
 const content=document.getElementById('content');
 const bar=document.getElementById('bar');
 const card=document.getElementById('card');
+const overlay=document.getElementById('overlay');
 function show(){card.classList.remove('show');void card.offsetWidth;card.classList.add('show');}
-function next(){
+function bubbles(){
+  const c=document.getElementById('bubbles');
+  for(let k=0;k<25;k++){
+    const b=document.createElement('div');b.className='bubble';
+    const size=20+Math.random()*60;
+    b.style.width=size+'px';b.style.height=size+'px';
+    b.style.left=Math.random()*100+'%';
+    b.style.animationDelay=Math.random()*12+'s';
+    b.style.animationDuration=(8+Math.random()*6)+'s';
+    c.appendChild(b);
+  }
+}
+bubbles();
+function render(){
   bar.style.width=(i/steps.length*100)+'%';
   title.textContent='Step '+(i+1)+' of '+steps.length;
   content.innerHTML='';
-  const p=document.createElement('p');p.textContent=steps[i];content.appendChild(p);
-  const t=document.createElement('div');t.className='tos';t.textContent=tosText;content.appendChild(t);
-  const pv=document.createElement('div');pv.className='tos';pv.textContent=privText;content.appendChild(pv);
+  const p=document.createElement('p');p.textContent=steps[i];p.style.fontSize='18px';p.style.marginBottom='10px';content.appendChild(p);
+  const pol=document.createElement('div');pol.className='policy';pol.textContent=policies[i];content.appendChild(pol);
   const cb=document.createElement('input');cb.type='checkbox';cb.id='cb';
-  const lbl=document.createElement('label');lbl.htmlFor='cb';lbl.textContent=' I accept';
-  content.appendChild(cb);content.appendChild(lbl);
+  const lbl=document.createElement('label');lbl.htmlFor='cb';lbl.textContent=' I have read and accept';lbl.style.marginLeft='6px';
+  const row=document.createElement('div');row.style.marginTop='10px';row.appendChild(cb);row.appendChild(lbl);content.appendChild(row);
   const btn=document.createElement('button');btn.textContent='Accept';btn.disabled=true;
   cb.onchange=()=>btn.disabled=!cb.checked;
   btn.onclick=()=>{
-    btn.disabled=true;cb.disabled=true;
-    setTimeout(()=>{i++; if(i<steps.length) render(); else claim();},2000);
+    btn.disabled=true;cb.disabled=true;overlay.classList.add('show');
+    setTimeout(()=>{overlay.classList.remove('show');i++; if(i<steps.length) render(); else claim();},2000);
   };
   content.appendChild(btn);
   show();
 }
-function render(){next();}
 function claim(){
   bar.style.width='100%';
   title.textContent='Result Ready';
-  content.innerHTML='<p>We have your result. Claim it by entering your email.</p><input id="email" type="email" placeholder="you@example.com"><br><br><button id="verify">Verify</button>';
+  content.innerHTML='<p style="font-size:18px;">We have your result. Claim it by entering your email.</p><input id="email" type="email" placeholder="you@example.com"><br><br><button id="verify">Verify</button><p style="margin-top:16px;font-size:13px;"><a href="about.html" style="color:#ff6a1a;">About</a> · <a href="contact.html" style="color:#ff6a1a;">Contact</a></p>';
   document.getElementById('verify').onclick=()=>{
     const r=document.createElement('div');r.className='result';r.textContent='You are gay.';
     content.appendChild(r);
+    const q=document.createElement('p');q.textContent='Do you want to restart?';q.style.marginTop='20px';q.style.fontSize='18px';content.appendChild(q);
+    const yes=document.createElement('button');yes.textContent='YES';yes.style.fontSize='22px';yes.style.padding='16px 40px';yes.style.marginRight='12px';
+    yes.onclick=()=>{i=0;render();};
+    const no=document.createElement('button');no.textContent='no';no.style.fontSize='11px';no.style.padding='4px 10px';no.style.background='#ddd';no.style.color='#666';
+    no.onclick=()=>{no.textContent='ok';};
+    content.appendChild(yes);content.appendChild(no);
   };
   show();
 }
