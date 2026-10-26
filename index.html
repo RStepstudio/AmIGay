@@ -2,92 +2,71 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Verification Portal</title>
-<link rel="stylesheet" href="style.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Policy Verification Portal | Multi-Step Compliance Review</title>
+<meta name="description" content="Professional multi-step policy verification portal for reviewing terms, privacy, and compliance policies with secure consent tracking.">
+<meta name="keywords" content="policy verification, compliance review, terms acceptance, privacy policy, multi-step form">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Policy Verification Portal | Multi-Step Compliance Review">
+<meta property="og:description" content="Professional multi-step policy verification portal for reviewing terms, privacy, and compliance policies with secure consent tracking.">
+<meta property="og:type" content="website">
+<link rel="canonical" href="./index.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="css/main.css">
 </head>
 <body>
-<div class="bg"></div>
-<div class="bubbles" id="bubbles"></div>
-<div class="wrap">
-<div class="card" id="card">
-<div class="progress"><div class="bar" id="bar"></div></div>
-<h1 id="title"></h1>
-<div id="content"></div>
+<header class="site-header" id="siteHeader">
+  <div class="logo">
+    <span class="logo-dot"></span>
+    <span>Policy Verification Portal</span>
+  </div>
+  <nav class="nav">
+    <a href="index.html" class="nav-link active">Home</a>
+    <a href="pages/about.html" class="nav-link">About</a>
+    <a href="pages/contact.html" class="nav-link">Contact</a>
+  </nav>
+</header>
+
+<main class="site-main">
+  <div class="ambient">
+    <div class="ambient-grid"></div>
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+  </div>
+  
+  <div class="container">
+    <article class="card" id="card">
+      <header class="card-header">
+        <div class="progress-track">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <div class="header-top">
+          <h1 class="card-title" id="cardTitle">Policy Review</h1>
+          <span class="step-counter" id="stepCounter"></span>
+        </div>
+        <p class="card-subtitle">Review and accept each policy to proceed to verification</p>
+      </header>
+      
+      <div class="card-body" id="cardBody"></div>
+    </article>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-content">
+    <span>&copy; 2026 Policy Verification Portal</span>
+    <span class="footer-sep">·</span>
+    <a href="pages/about.html" class="footer-link">About</a>
+    <span class="footer-sep">·</span>
+    <a href="pages/contact.html" class="footer-link">Contact</a>
+  </div>
+</footer>
+
+<div class="overlay" id="overlay">
+  <div class="spinner"></div>
 </div>
-</div>
-<div class="overlay" id="overlay"><div class="spinner"></div></div>
-<script>
-const steps = [
- "Accept Terms of Service","Accept Privacy Policy","Accept Cookie Policy","Confirm you are 18+",
- "Agree to data collection","Accept marketing emails","Confirm nationality","Verify identity",
- "Accept refund policy","Accept community guidelines","Confirm email ownership","Accept tracking",
- "Accept analytics","Confirm device ownership","Accept third-party sharing","Accept geolocation",
- "Confirm phone number","Accept SMS updates","Accept push notifications","Accept biometric data",
- "Confirm payment method","Accept subscription terms","Accept auto-renewal","Accept cancellation policy",
- "Confirm billing address","Accept shipping terms","Accept return policy","Confirm tax compliance",
- "Accept export controls","Accept age verification","Confirm parental consent","Accept accessibility terms",
- "Accept DMCA policy","Accept anti-spam policy","Confirm account security","Accept password policy",
- "Accept 2FA terms","Confirm backup codes","Accept recovery email","Accept security questions",
- "Confirm identity documents","Accept KYC","Accept AML","Confirm sanctions screening",
- "Accept risk disclosure","Accept liability waiver","Accept arbitration clause","Accept class action waiver",
- "Final confirmation","I have read everything"
-];
-const policies = steps.map((s,idx)=>`POLICY ${idx+1}: ${s}\n\n`+`This document governs your use of the service in relation to "${s}". By continuing you acknowledge that we may collect, process, retain, and share data necessary to enforce this policy, including identifiers, device metadata, usage logs, and derived inferences. You agree that enforcement may be automated and that decisions may be irreversible. Data may be transferred across borders and retained for the maximum period permitted by law. You waive any right to individual or class-wide relief related to this policy and consent to binding arbitration. Modifications may be made without notice and continued use constitutes acceptance. You confirm you have read, understood, and voluntarily agreed to all terms herein, including any referenced documents and future amendments. Failure to comply may result in suspension or termination without refund. This policy is provided as-is without warranties. Governing law: none specified. Disputes: arbitration only. Contact: none.`);
-let i=0;
-const title=document.getElementById('title');
-const content=document.getElementById('content');
-const bar=document.getElementById('bar');
-const card=document.getElementById('card');
-const overlay=document.getElementById('overlay');
-function show(){card.classList.remove('show');void card.offsetWidth;card.classList.add('show');}
-function bubbles(){
-  const c=document.getElementById('bubbles');
-  for(let k=0;k<25;k++){
-    const b=document.createElement('div');b.className='bubble';
-    const size=20+Math.random()*60;
-    b.style.width=size+'px';b.style.height=size+'px';
-    b.style.left=Math.random()*100+'%';
-    b.style.animationDelay=Math.random()*12+'s';
-    b.style.animationDuration=(8+Math.random()*6)+'s';
-    c.appendChild(b);
-  }
-}
-bubbles();
-function render(){
-  bar.style.width=(i/steps.length*100)+'%';
-  title.textContent='Step '+(i+1)+' of '+steps.length;
-  content.innerHTML='';
-  const p=document.createElement('p');p.textContent=steps[i];p.style.fontSize='18px';p.style.marginBottom='10px';content.appendChild(p);
-  const pol=document.createElement('div');pol.className='policy';pol.textContent=policies[i];content.appendChild(pol);
-  const cb=document.createElement('input');cb.type='checkbox';cb.id='cb';
-  const lbl=document.createElement('label');lbl.htmlFor='cb';lbl.textContent=' I have read and accept';lbl.style.marginLeft='6px';
-  const row=document.createElement('div');row.style.marginTop='10px';row.appendChild(cb);row.appendChild(lbl);content.appendChild(row);
-  const btn=document.createElement('button');btn.textContent='Accept';btn.disabled=true;
-  cb.onchange=()=>btn.disabled=!cb.checked;
-  btn.onclick=()=>{
-    btn.disabled=true;cb.disabled=true;overlay.classList.add('show');
-    setTimeout(()=>{overlay.classList.remove('show');i++; if(i<steps.length) render(); else claim();},2000);
-  };
-  content.appendChild(btn);
-  show();
-}
-function claim(){
-  bar.style.width='100%';
-  title.textContent='Result Ready';
-  content.innerHTML='<p style="font-size:18px;">We have your result. Claim it by entering your email.</p><input id="email" type="email" placeholder="you@example.com"><br><br><button id="verify">Verify</button><p style="margin-top:16px;font-size:13px;"><a href="about.html" style="color:#ff6a1a;">About</a> · <a href="contact.html" style="color:#ff6a1a;">Contact</a></p>';
-  document.getElementById('verify').onclick=()=>{
-    const r=document.createElement('div');r.className='result';r.textContent='You are gay.';
-    content.appendChild(r);
-    const q=document.createElement('p');q.textContent='Do you want to restart?';q.style.marginTop='20px';q.style.fontSize='18px';content.appendChild(q);
-    const yes=document.createElement('button');yes.textContent='YES';yes.style.fontSize='22px';yes.style.padding='16px 40px';yes.style.marginRight='12px';
-    yes.onclick=()=>{i=0;render();};
-    const no=document.createElement('button');no.textContent='no';no.style.fontSize='11px';no.style.padding='4px 10px';no.style.background='#ddd';no.style.color='#666';
-    no.onclick=()=>{no.textContent='ok';};
-    content.appendChild(yes);content.appendChild(no);
-  };
-  show();
-}
-render();
-</script>
+
+<script src="js/app.js"></script>
 </body>
 </html>
